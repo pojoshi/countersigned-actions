@@ -1,0 +1,22 @@
+{
+  "name": "countersigned-actions-playground",
+  "version": "1.0.0",
+  "description": "Browser playground for countersigned-actions: the decision engine and an in-memory gate in TypeScript, checked against the Python service with shared fixtures.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build:demo": "node scripts/build-demo.mjs",
+    "check:demo": "node scripts/check-demo.mjs",
+    "check": "npm run typecheck && npm test && npm run build:demo && npm run check:demo"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}

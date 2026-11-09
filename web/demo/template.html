@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>countersigned-actions</title>
+<meta name="description" content="Try to get an AI agent's action past a policy gate. The model proposes, policy decides, and nothing runs without a recorded reason.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #e1e2e7; --card: #ffffff; --ink: #343b58; --muted: #5a6186; --line: #cbcfdd; --soft: #eceef2;
+  --accent: #6a3fc0;
+  --execute: #4a6b2c; --escalate: #8a5a14; --ask: #2959aa; --defer: #7847bd; --refuse: #c0314f;
+  --focus: var(--accent); --on-accent: #ffffff;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1a1b26; --card: #1f2335; --ink: #c0caf5; --muted: #8b92b8; --line: #2f3454; --soft: #252a40;
+    --accent: #bb9af7;
+    --execute: #9ece6a; --escalate: #e0af68; --ask: #7aa2f7; --defer: #bb9af7; --refuse: #f7768e;
+    --focus: var(--accent); --on-accent: #16161e; color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--sans); }
+button, select, textarea, input { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--mono); font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px 48px; }
+
+header { padding: 28px 0 18px; display: grid; gap: 6px; }
+header h1 { font-size: clamp(26px, 4vw, 38px); }
+header p { margin: 0; max-width: 62ch; color: var(--muted); }
+.tagline { color: var(--ink); font-family: var(--mono); font-size: 18px; }
+.note { font-size: 13px; border-left: 3px solid var(--line); padding-left: 10px; margin-top: 6px; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 980px) { .grid { grid-template-columns: 310px minmax(0, 1fr) 300px; align-items: start; } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.panel > h2 { font-size: 17px; margin-bottom: 8px; }
+.panel .sub { color: var(--muted); font-size: 13px; margin: -4px 0 10px; }
+
+/* scenarios */
+.group { font-size: 13px; color: var(--muted); margin: 12px 0 4px; font-weight: 600; }
+.scn { display: block; width: 100%; text-align: left; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; margin: 0 0 5px; cursor: pointer; font-size: 14px; }
+.scn:hover { border-color: var(--accent); }
+.scn small { display: block; color: var(--muted); font-size: 12px; }
+details.custom { margin-top: 14px; }
+details.custom summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+textarea#customJson { width: 100%; min-height: 150px; margin-top: 8px; padding: 8px; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; font: 12.5px/1.45 var(--mono); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.btn { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 6px; padding: 7px 12px; cursor: pointer; font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
+.btn:hover { filter: brightness(1.12); }
+select { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+
+/* decision slip: the one memorable element */
+.slip { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; overflow: hidden; }
+.slip.empty { color: var(--muted); }
+.slip .who { font-size: 13px; color: var(--muted); }
+.slip .what { font-family: var(--mono); font-size: 13px; margin: 2px 0 12px; overflow-wrap: anywhere; }
+.stamp { display: inline-block; font-family: var(--mono); font-size: clamp(24px, 4vw, 34px); font-weight: 700; padding: 2px 14px 4px; border: 3px solid currentColor; border-radius: 6px; transform: rotate(-3deg); margin: 2px 0 12px; letter-spacing: 0.01em; }
+.stamp.fresh { animation: thud 260ms cubic-bezier(.2,.9,.3,1.3); }
+@keyframes thud { from { transform: rotate(-9deg) scale(1.45); opacity: 0; } to { transform: rotate(-3deg) scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .stamp.fresh { animation: none; } }
+.c-execute { color: var(--execute); } .c-escalate { color: var(--escalate); } .c-ask { color: var(--ask); }
+.c-defer { color: var(--defer); } .c-refuse { color: var(--refuse); } .c-malformed { color: var(--refuse); }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.meter b { display: block; font-size: 22px; font-family: var(--mono); }
+.meter span { font-size: 12px; color: var(--muted); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; margin-top: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: currentColor; }
+.sect { margin-top: 12px; }
+.sect h3 { font-size: 14px; font-family: var(--sans); font-weight: 700; margin-bottom: 4px; }
+.reasons { margin: 0; padding-left: 18px; }
+.ev { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.ev li { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 8px; font-size: 13.5px; }
+.tag { font-size: 11.5px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; text-align: center; color: var(--muted); height: fit-content; }
+.tag.agent_claim { color: var(--refuse); border-color: var(--refuse); }
+.final { margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: 14px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.mono { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* queue */
+.queue { margin-top: 14px; }
+.q-item { border: 1px solid var(--line); border-left: 4px solid var(--escalate); border-radius: 6px; padding: 9px 10px; margin-bottom: 8px; background: var(--soft); }
+.q-item .what { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.q-item .row { margin-top: 6px; }
+.empty-note { color: var(--muted); font-size: 13.5px; }
+
+/* world */
+.world table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.world td, .world th { padding: 2px 0; text-align: left; font-weight: 400; }
+.world td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.world h3 { font-size: 13px; font-family: var(--sans); font-weight: 700; margin: 10px 0 2px; }
+.kill { display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.kill.on { color: var(--refuse); font-weight: 600; }
+.kill input[type=text] { flex: 1; min-width: 100px; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+
+/* audit */
+.audit { margin-top: 16px; overflow-x: auto; }
+table.log { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+table.log th { text-align: left; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0; }
+table.log td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.log td.h { font-family: var(--mono); font-size: 12px; }
+table.log tr.clickable { cursor: pointer; }
+table.log tr.clickable:hover td { background: var(--soft); }
+table.log tr.detail td { background: var(--soft); padding: 8px 10px; }
+table.log pre { margin: 0; font: 12px/1.45 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
+table.log tr.bad td { background: color-mix(in srgb, var(--refuse) 14%, transparent); }
+table.log tr.bad td.h { color: var(--refuse); font-weight: 700; }
+.link { color: var(--muted); }
+.verify { margin-top: 10px; font-size: 14px; }
+.verify.ok { color: var(--execute); } .verify.bad { color: var(--refuse); }
+.toast { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--card); padding: 8px 14px; border-radius: 8px; max-width: 90vw; font-size: 14px; }
+.toast[hidden] { display: none; }
+footer { color: var(--muted); font-size: 13px; margin-top: 22px; max-width: 80ch; }
+footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>countersigned-actions</h1>
+  <p class="tagline">The model proposes. Policy decides. Nothing runs without a recorded reason.</p>
+  <p>Pick something an AI agent might try, like deleting customer records, splitting a big refund into small ones, or citing a ticket that doesn't exist, and see what the gate does, who has to sign, and what lands in the audit log.</p>
+  <p class="note">This page runs the decision engine and an in-memory gate in your browser. The real service is Python and PostgreSQL in the repo; the two are checked against the same fixtures, and nothing here talks to a server.</p>
+</header>
+
+<div class="grid">
+  <section class="panel" aria-labelledby="h-agent">
+    <h2 id="h-agent">What the agent tries</h2>
+    <p class="sub">Each button sends the agent's proposal to the gate.</p>
+    <div id="scenarioList"></div>
+    <details class="custom">
+      <summary>Write your own proposal</summary>
+      <div class="row">
+        <label for="agentSelect">Agent</label>
+        <select id="agentSelect"></select>
+      </div>
+      <textarea id="customJson" spellcheck="false" aria-label="Proposal JSON"></textarea>
+      <div class="row"><button class="btn" id="submitCustom" type="button">Send to the gate</button></div>
+      <p class="sub">Try adding <code>"approved": true</code>. Model output is untrusted, so unknown fields are rejected.</p>
+    </details>
+  </section>
+
+  <section aria-labelledby="h-gate">
+    <h2 id="h-gate" style="margin-bottom:8px">What the gate decides</h2>
+    <div id="decision" class="slip empty" aria-live="polite">Send a proposal and the decision appears here, with the evidence behind it.</div>
+    <div class="panel queue">
+      <h2>Waiting for a human</h2>
+      <p class="sub">Approvals name the exact action by its hash, work once, and expire after four hours.</p>
+      <div id="queue"></div>
+    </div>
+  </section>
+
+  <section class="panel world" aria-labelledby="h-world">
+    <h2 id="h-world">The business it protects</h2>
+    <div class="kill" id="killRow">
+      <button class="btn ghost" id="killToggle" type="button">Turn kill switch on</button>
+      <input type="text" id="killReason" placeholder="Reason" aria-label="Kill switch reason" value="incident drill">
+    </div>
+    <div class="row">
+      <label for="timeSelect">Time (UTC)</label>
+      <select id="timeSelect"><option value="12">12:00, outside the prod change window</option><option value="3">03:00, inside it</option></select>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="advanceBtn" type="button">Move on 25 hours</button>
+      <button class="btn ghost" id="resetBtn" type="button">Start over</button>
+    </div>
+    <div id="worldPanel"></div>
+  </section>
+</div>
+
+<section class="panel audit" aria-labelledby="h-audit">
+  <h2 id="h-audit">The audit log</h2>
+  <p class="sub">Click a row to see what the gate saw: the inputs, the evidence, the reasoning and the outcome. Every row commits to the hash of the row before it, so changing anything breaks the chain.</p>
+  <div class="row" style="margin:0 0 8px">
+    <button class="btn" id="verifyBtn" type="button">Check the chain</button>
+    <label for="tamperSeq">Edit entry</label>
+    <select id="tamperSeq"></select>
+    <button class="btn ghost" id="tamperBtn" type="button">Edit it behind the gate's back</button>
+  </div>
+  <div id="verifyResult" class="verify" role="status"></div>
+  <div class="mono" id="headHash"></div>
+  <div class="row"><button class="btn ghost" id="showAll" type="button" hidden>Show all entries</button></div>
+  <table class="log">
+    <thead><tr><th>#</th><th>Event</th><th>Actor</th><th>Action</th><th>Came after</th><th>This entry</th></tr></thead>
+    <tbody id="auditBody"></tbody>
+  </table>
+</section>
+
+<footer>
+  Tamper-evident, not tamper-proof: someone with full database access can rewrite the whole chain. Copy the latest hash somewhere they can't reach and a rewrite shows up. The repo has the failure tests, the invariants and the limits of this design.
+</footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/*__GATE_BUNDLE__*/
+</script>
+<script>
+(function () {
+  var G = GateLib;
+  var sim = new G.Sim();
+  var ORIG = {}; (function () { var c = sim.world.customers; Object.keys(c).forEach(function (k) { ORIG[k] = c[k].live; }); })();
+  var $ = function (id) { return document.getElementById(id); };
+  var STAMP = { execute: 'Allowed', escalate: 'Needs a human', ask: 'Sent back', defer: 'Not yet', refuse: 'Refused', malformed: 'Rejected' };
+  var FINAL = {
+    executed: 'Ran, and the result is in the log.', queued: 'Waiting for the worker.', pending_approval: 'Waiting for a human to sign.',
+    approved: 'Approved, waiting for the worker.', needs_info: 'Sent back to the agent. Nothing ran.', deferred: 'Held until the window opens. Nothing ran.',
+    refused: 'Refused. Nothing ran.', blocked: 'Blocked at the last check. Nothing ran.', rejected: 'Rejected by a human. Nothing ran.',
+    expired: 'Approval window passed. Nothing ran.', failed: 'Failed. The log says why.'
+  };
+  var SEED = { operation: 'customer_data.delete_records', params: { segment: 'inactive-2y', count: 10, ticket_id: 'TKT-1001', reason: 'clean up old accounts' } };
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function short(h) { return h ? h.slice(0, 8) : ''; }
+  function params(p) { return Object.keys(p).map(function (k) { return k + '=' + p[k]; }).join('  '); }
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { t.hidden = true; }, 3500); }
+
+  // ---------------------------------------------------------- scenarios
+  function buildScenarios() {
+    var list = $('scenarioList');
+    var groups = [['Start here', function (s) { return s.id === 'S00'; }],
+      ['Everyday work', function (s) { return s.id !== 'S00' && s.steps[0].kind !== 'unsafe'; }],
+      ['Things an agent might try', function (s) { return s.id !== 'S00' && s.steps[0].kind === 'unsafe'; }]];
+    groups.forEach(function (g) {
+      list.appendChild(el('div', 'group', g[0]));
+      G.SCENARIOS.filter(g[1]).forEach(function (s) {
+        var b = el('button', 'scn'); b.type = 'button'; b.id = 'sc' + s.id; b.textContent = s.title;
+        var who = el('small', null, s.agent + (s.steps.length > 1 ? ' · ' + s.steps.length + ' proposals' : '')); b.appendChild(who);
+        b.addEventListener('click', function () { runScenario(s); });
+        list.appendChild(b);
+      });
+    });
+    var sel = $('agentSelect');
+    Object.keys(G.AGENT_GRANTS).forEach(function (a) { var o = el('option', null, a); o.value = a; sel.appendChild(o); });
+    $('customJson').value = JSON.stringify(SEED, null, 2);
+  }
+
+  function settle(a) {
+    if ('malformed' in a) return { malformed: a.malformed };
+    if (a.status === 'queued') sim.runWorker();
+    return sim.get(a.id);
+  }
+
+  // Time only moves forward: pick the next occurrence of that hour (UTC).
+  function moveToHour(h) {
+    var n = sim.now(); if (n.getUTCHours() === h) { $('timeSelect').value = String(h === 3 ? 3 : 12); return; }
+    var t = new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate(), h, 0, 0));
+    if (t.getTime() <= n.getTime()) t = new Date(t.getTime() + 86400000);
+    sim.setTime(t); $('timeSelect').value = String(h === 3 ? 3 : 12);
+    var rel = sim.releaseDue(); if (rel) sim.runWorker();
+  }
+
+  function runScenario(s) {
+    moveToHour(s.at);
+    if (s.kill && !sim.kill.active) sim.setKill(true, 'admin', 'scenario');
+    var results = s.steps.map(function (st) { return settle(sim.submit(s.agent, st.raw)); });
+    var last = results[results.length - 1];
+    if (results.length === 1) show(last, s.agent, null);
+    else show(last, s.agent, summary(results));
+    render();
+  }
+
+  function summary(results) {
+    var ran = results.filter(function (r) { return r.status === 'executed'; }).length;
+    var held = results.length - ran;
+    var by = {};
+    results.forEach(function (r) { if (r.status !== 'executed') by[r.status] = (by[r.status] || 0) + 1; });
+    return ran + ' of ' + results.length + ' ran on their own. ' + held + ' held back' + (held ? ' (' + Object.keys(by).map(function (k) { return by[k] + ' ' + k.replace('_', ' '); }).join(', ') + ')' : '') + '. The last one is shown below.';
+  }
+
+  // ----------------------------------------------------------- decision
+  function show(a, agent, note) {
+    var box = $('decision'); box.className = 'slip'; box.textContent = '';
+    if ('malformed' in a) {
+      box.appendChild(el('div', 'who', agent + ' sent something the gate could not read'));
+      var st = el('div', 'stamp c-malformed fresh', STAMP.malformed); box.appendChild(st);
+      var s = el('div', 'sect'); s.appendChild(el('h3', null, 'Why')); s.appendChild(el('div', null, a.malformed)); box.appendChild(s);
+      box.appendChild(el('div', 'final', 'Never became an action. The attempt is in the log, without its content.'));
+      return;
+    }
+    var d = a.decision;
+    box.appendChild(el('div', 'who', a.agent_id + ' proposed'));
+    box.appendChild(el('div', 'what', a.operation + '   ' + params(a.params)));
+    if (note) box.appendChild(el('div', 'note', note));
+    box.appendChild(el('div', 'stamp c-' + d.outcome + ' fresh', STAMP[d.outcome]));
+
+    var m = el('div', 'meters');
+    var risk = el('div', 'meter c-' + (d.risk_score >= 60 ? 'refuse' : d.risk_score >= 35 ? 'escalate' : 'execute'));
+    risk.appendChild(el('b', null, String(d.risk_score))); risk.appendChild(el('span', null, 'risk, out of 100'));
+    var bar = el('div', 'bar'); var fill = el('i'); fill.style.width = d.risk_score + '%'; bar.appendChild(fill); risk.appendChild(bar); m.appendChild(risk);
+    var conf = el('div', 'meter'); conf.appendChild(el('b', null, String(d.confidence))); conf.appendChild(el('span', null, 'confidence, lower when a claim did not check out'));
+    m.appendChild(conf);
+    var rev = el('div', 'meter'); rev.appendChild(el('b', null, d.reversibility)); rev.appendChild(el('span', null, d.effective_quantity == null ? 'reversibility' : 'reversibility, ' + d.effective_quantity + ' affected')); m.appendChild(rev);
+    box.appendChild(m);
+
+    var why = el('div', 'sect'); why.appendChild(el('h3', null, d.outcome === 'execute' ? 'Why it is allowed' : 'Why not on its own'));
+    var ul = el('ul', 'reasons'); d.reasons.forEach(function (r) { ul.appendChild(el('li', null, r)); }); why.appendChild(ul); box.appendChild(why);
+
+    if (!d.missing_information.length) {
+      var mn = el('div', 'sect'); mn.appendChild(el('h3', null, 'Missing information')); mn.appendChild(el('div', null, 'Nothing. The proposal was complete.')); box.appendChild(mn);
+    }
+    if (d.missing_information.length) {
+      var mi = el('div', 'sect'); mi.appendChild(el('h3', null, 'What the agent has to fix'));
+      var ul2 = el('ul', 'reasons'); d.missing_information.forEach(function (r) { ul2.appendChild(el('li', null, r)); }); mi.appendChild(ul2); box.appendChild(mi);
+    }
+    if (d.retry_after) box.appendChild(el('div', 'sect', 'Try again after ' + d.retry_after.replace('T', ' ').replace(':00.000Z', ' UTC') + '.'));
+
+    var evs = el('div', 'sect'); evs.appendChild(el('h3', null, 'Evidence used'));
+    var evl = el('ul', 'ev');
+    d.evidence.forEach(function (e) { var li = el('li'); li.appendChild(el('span', 'tag ' + e.source, e.source.replace('_', ' '))); li.appendChild(el('span', null, e.detail)); evl.appendChild(li); });
+    evs.appendChild(evl); box.appendChild(evs);
+
+    var f = el('div', 'final'); f.appendChild(el('span', null, FINAL[a.status] || a.status));
+    f.appendChild(el('span', 'mono', 'policy ' + d.policy_version + '  ·  action ' + short(a.action_hash)));
+    box.appendChild(f);
+  }
+
+  // -------------------------------------------------------------- queue
+  function renderQueue() {
+    var q = $('queue'); q.textContent = '';
+    var pending = sim.actions.filter(function (a) { return a.status === 'pending_approval'; });
+    if (!pending.length) { q.appendChild(el('div', 'empty-note', 'Nothing is waiting. Try erasing the 40 VIP records, or a hard delete.')); return; }
+    pending.slice(-4).forEach(function (a) {
+      var it = el('div', 'q-item'); it.setAttribute('data-id', a.id);
+      it.appendChild(el('div', null, a.agent_id + ' wants to ' + a.operation.split('.')[1].replace('_', ' ')));
+      it.appendChild(el('div', 'what', params(a.params)));
+      it.appendChild(el('div', 'mono', 'risk ' + a.decision.risk_score + '  ·  ' + a.decision.reversibility + '  ·  hash ' + short(a.action_hash)));
+      var r = el('div', 'row');
+      var ap = el('button', 'btn approve', 'Approve as alice'); ap.type = 'button';
+      ap.addEventListener('click', function () { act(function () { sim.decide(a.id, 'alice', 'approve', a.action_hash, 'looks right'); sim.runWorker(); }, a.id); });
+      var rj = el('button', 'btn ghost reject', 'Reject'); rj.type = 'button';
+      rj.addEventListener('click', function () { act(function () { sim.decide(a.id, 'alice', 'reject', a.action_hash, 'not convinced'); }, a.id); });
+      r.appendChild(ap); r.appendChild(rj); it.appendChild(r); q.appendChild(it);
+    });
+    if (pending.length > 4) q.appendChild(el('div', 'empty-note', (pending.length - 4) + ' more are waiting. Each needs its own approval.'));
+  }
+
+  function act(fn, id) {
+    try { fn(); } catch (e) { toast(e.message); }
+    if (id) show(sim.get(id), sim.get(id).agent_id, null);
+    render();
+  }
+
+  // -------------------------------------------------------------- world
+  function renderWorld() {
+    var w = $('worldPanel'); w.textContent = '';
+    function section(title, rows) {
+      w.appendChild(el('h3', null, title));
+      var t = el('table'); rows.forEach(function (r) { var tr = el('tr'); tr.appendChild(el('td', null, r[0])); tr.appendChild(el('td', null, r[1])); t.appendChild(tr); }); w.appendChild(t);
+    }
+    var segs = Object.keys(sim.world.customers);
+    section('Customers still live', segs.map(function (s) { return [s, sim.world.customers[s].live + ' / ' + ORIG[s]]; }));
+    section('Refunded', Object.keys(sim.world.payments).map(function (p) { var x = sim.world.payments[p]; return [p, (x.refunded_cents / 100).toFixed(2) + ' of ' + (x.amount_cents / 100).toFixed(2)]; }));
+    section('Replicas', Object.keys(sim.world.services).map(function (s) { return [s + ' (' + sim.world.services[s].environment + ')', String(sim.world.services[s].replicas)]; }));
+    section('Left the building', [['exports', String(sim.world.exports.length)], ['transfers', String(sim.world.transfers.length)]]);
+    var k = $('killToggle'); $('killRow').className = 'kill' + (sim.kill.active ? ' on' : '');
+    k.textContent = sim.kill.active ? 'Turn kill switch off' : 'Turn kill switch on';
+  }
+
+  // -------------------------------------------------------------- audit
+  var showAll = false; var open = {};
+  function renderAudit() {
+    var body = $('auditBody'); body.textContent = '';
+    var v = sim.verify(); var bad = $('verifyResult').getAttribute('data-checked') === '1' && !v.ok ? v.first_bad_seq : null;
+    var rows = sim.audit.slice().reverse(); var expanded = showAll || bad !== null; var cap = expanded ? rows.length : 20;
+    $('showAll').hidden = rows.length <= 20 || bad !== null; $('showAll').textContent = showAll ? 'Show the latest 20' : 'Show all ' + rows.length + ' entries';
+    rows.slice(0, cap).forEach(function (r) {
+      var tr = el('tr', bad === r.seq ? 'bad' : ''); tr.setAttribute('data-seq', r.seq);
+      tr.appendChild(el('td', null, String(r.seq))); tr.appendChild(el('td', null, r.event_type.replace(/_/g, ' ')));
+      tr.appendChild(el('td', null, r.actor)); tr.appendChild(el('td', 'mono', r.action_id || ''));
+      tr.appendChild(el('td', 'h link', short(r.prev_hash))); tr.appendChild(el('td', 'h', short(r.hash)));
+      tr.className += ' clickable'; tr.tabIndex = 0; tr.setAttribute('aria-expanded', open[r.seq] ? 'true' : 'false');
+      var toggle = (function (row) { return function () { open[row.seq] = !open[row.seq]; renderAudit(); }; })(r);
+      tr.addEventListener('click', toggle);
+      tr.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); } });
+      body.appendChild(tr);
+      if (open[r.seq]) {
+        var dt = el('tr', 'detail'); var td = el('td'); td.colSpan = 6;
+        var pre = el('pre', null, JSON.stringify(r.payload, null, 2)); td.appendChild(pre); dt.appendChild(td); body.appendChild(dt);
+      }
+    });
+    $('headHash').textContent = 'Latest hash (copy it somewhere safe): ' + sim.head();
+    var sel = $('tamperSeq'); var cur = sel.value; sel.textContent = '';
+    sim.audit.forEach(function (r) { var o = el('option', null, '#' + r.seq + ' ' + r.event_type.replace(/_/g, ' ')); o.value = String(r.seq); sel.appendChild(o); });
+    if (cur && sim.audit.some(function (r) { return String(r.seq) === cur; })) sel.value = cur;
+  }
+
+  function render() { renderQueue(); renderWorld(); renderAudit(); }
+
+  // ------------------------------------------------------------ wiring
+  $('submitCustom').addEventListener('click', function () {
+    var raw = $('customJson').value; var agent = $('agentSelect').value;
+    var a = sim.submit(agent, raw); var r = settle(a); show(r, agent, null); render();
+  });
+  $('killToggle').addEventListener('click', function () {
+    sim.setKill(!sim.kill.active, 'admin', $('killReason').value || null);
+    var n = sim.runWorker().filter(function (x) { return x.result === 'blocked'; }).length;
+    toast(sim.kill.active ? 'Kill switch on. Everything new is refused' + (n ? ' and ' + n + ' queued action(s) blocked.' : '.') : 'Kill switch off.'); render();
+  });
+  $('timeSelect').addEventListener('change', function () {
+    moveToHour(Number($('timeSelect').value)); render();
+  });
+  $('advanceBtn').addEventListener('click', function () {
+    sim.advance(25 * 3600000); var rel = sim.releaseDue(); var exp = sim.expireStale(); sim.runWorker();
+    toast('Moved on 25 hours. ' + rel + ' held action(s) re-decided, ' + exp + ' approval(s) expired.'); render();
+  });
+  $('resetBtn').addEventListener('click', function () {
+    sim = new G.Sim(); $('verifyResult').textContent = ''; $('verifyResult').className = 'verify'; $('verifyResult').removeAttribute('data-checked');
+    $('timeSelect').value = '12'; $('decision').className = 'slip empty'; $('decision').textContent = 'Send a proposal and the decision appears here, with the evidence behind it.'; render();
+  });
+  $('showAll').addEventListener('click', function () { showAll = !showAll; renderAudit(); });
+  $('verifyBtn').addEventListener('click', function () {
+    var v = sim.verify(); var out = $('verifyResult'); out.setAttribute('data-checked', '1');
+    out.className = 'verify ' + (v.ok ? 'ok' : 'bad');
+    out.textContent = v.ok ? 'The chain is intact: ' + v.entries + ' entries.' : 'Broken at entry #' + v.first_bad_seq + ': ' + v.reason + '.';
+    renderAudit();
+  });
+  $('tamperBtn').addEventListener('click', function () {
+    var seq = Number($('tamperSeq').value); if (!seq) return;
+    sim.tamper(seq); $('verifyResult').removeAttribute('data-checked'); $('verifyResult').textContent = ''; $('verifyResult').className = 'verify';
+    toast('Entry #' + seq + ' was edited directly. The gate saw nothing. Now check the chain.'); renderAudit();
+  });
+
+  buildScenarios(); render();
+  window.__sim = function () { return sim; };
+})();
+</script>
+</body>
+</html>
