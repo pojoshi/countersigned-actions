@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "countersigned-actions"
+version = "0.1.0"
+description = "A policy gate and audit trail for AI agents: the model proposes, deterministic policy decides, a controlled executor acts, and a hash-chained log records why."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "psycopg[binary]>=3.2",
+  "psycopg-pool>=3.2",
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+  "pydantic>=2.6",
+  "opentelemetry-api>=1.25",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27", "hypothesis>=6.100", "opentelemetry-sdk>=1.25"]
+
+[project.scripts]
+countersigned = "countersigned.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+countersigned = ["schema.sql", "default_policy.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
