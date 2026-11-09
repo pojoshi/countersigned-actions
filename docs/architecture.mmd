@@ -1,0 +1,36 @@
+%%{init: {'theme':'base','themeVariables':{'background':'#1a1b26','primaryColor':'#24283b','primaryTextColor':'#c0caf5','primaryBorderColor':'#7aa2f7','lineColor':'#7dcfff','secondaryColor':'#1f2335','tertiaryColor':'#16161e','clusterBkg':'#16161e','clusterBorder':'#414868','edgeLabelBackground':'#1a1b26','fontFamily':'IBM Plex Sans, system-ui, sans-serif'}}}%%
+flowchart TB
+  subgraph I["1 · Inputs"]
+    direction LR
+    M["Model output<br/>(untrusted JSON)"] --> PP["parse_proposal<br/>strict schema,<br/>unknown fields rejected"]
+    KEY["API key<br/>= who is asking"]
+    CLK["Clock, kill switch,<br/>active policy version"]
+  end
+  subgraph S["2 · Signals"]
+    direction LR
+    F["Verified facts<br/>ticket, segment size,<br/>payment, service"]
+    U["Cumulative use<br/>24h per agent and global"]
+    R["Reversibility,<br/>claim vs data,<br/>environment, grants"]
+  end
+  subgraph D["3 · Decision (pure function)"]
+    direction LR
+    E["evaluate()"] --> O["execute · ask · defer<br/>escalate · refuse"]
+    O --> X["confidence · risk score<br/>evidence · missing info<br/>reversibility"]
+  end
+  subgraph A["4 · Audit and action"]
+    direction LR
+    TX[("One transaction:<br/>action row + hash-chained<br/>audit entry + outbox row")]
+    H["Human approval<br/>single-use, bound to<br/>the action hash"]
+    W["Worker: claim, re-check<br/>kill switch, grants,<br/>facts, policy"]
+    EF["Effect<br/>row counts must match<br/>what was decided"]
+    H --> TX
+    TX --> W --> EF
+  end
+  PP --> F
+  KEY --> R
+  CLK --> U
+  F --> E
+  U --> E
+  R --> E
+  X --> TX
+  EF -->|"executed or blocked,<br/>logged with inputs"| TX
