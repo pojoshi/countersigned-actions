@@ -5,12 +5,13 @@
   "license": "MIT",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.18.0",
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build:demo": "node scripts/build-demo.mjs",
     "check:demo": "node scripts/check-demo.mjs",
-    "check": "npm run typecheck && npm test && npm run build:demo && npm run check:demo"
+    "check": "pnpm run typecheck && pnpm test && pnpm run build:demo && pnpm run check:demo"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -56,12 +56,12 @@ docker run -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=countersigned_test -p
 export COUNTERSIGNED_TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/countersigned_test
 pytest                       # 148 tests: unit, property-based, concurrency, tamper, API, known gaps
 python evals/run.py          # adversarial suite, writes evals/REPORT.md
-cd web && npm ci && npm run check   # TypeScript port + the demo page
+cd web && pnpm install --frozen-lockfile && pnpm run check   # TypeScript port + the demo page
 ```
 
 `.env.example` has the API container's settings. Demo keys are public on purpose, and only exist when `SEED_DEMO=1`.
 
-The Docker stack above is a real run, not a dry read: build, propose, escalate, approve, execute, verify. The CI workflow is the same — `act -j python`, `act -j playground`, and `act -j build` (pages.yml, minus the GitHub-hosted deploy step) all pass against the committed workflow file.
+The Docker stack above is a real run, not a dry read: build, propose, escalate, approve, execute, verify. The CI workflow is the same — `act -j python` and `act -j playground` pass against the committed workflow file. pages.yml's install-test-build steps pass too; `configure-pages` and the deploy job call the real GitHub API to check Pages is enabled, so those only run for real once this repo exists there.
 
 ## How it works
 
