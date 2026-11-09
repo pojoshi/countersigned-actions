@@ -1,0 +1,42 @@
+{
+  "name": "default",
+  "escalate_risk": 60,
+  "approval_ttl_minutes": 240,
+  "operations": {
+    "customer_data.delete_records": {
+      "required": ["segment", "count", "ticket_id", "reason"],
+      "ticket_kind": "erasure_request",
+      "pii": true,
+      "limits": { "auto": 25, "hard": 2000 },
+      "window": { "hours": 24, "agent_auto": 50, "agent_hard": 500, "global_hard": 1000 }
+    },
+    "customer_data.export_records": {
+      "required": ["count", "destination", "ticket_id", "reason"],
+      "ticket_kind": "data_request",
+      "pii": true,
+      "destinations": { "internal": ["internal-warehouse"], "external": ["partner-sftp"] },
+      "limits": { "auto": 100, "hard": 10000 },
+      "window": { "hours": 24, "agent_auto": 300, "agent_hard": 5000, "global_hard": 20000 }
+    },
+    "payments.refund": {
+      "required": ["payment_id", "amount_cents", "ticket_id", "reason"],
+      "ticket_kind": "refund_request",
+      "pii": false,
+      "limits": { "auto": 5000, "hard": 500000 },
+      "window": { "hours": 24, "agent_auto": 20000, "agent_hard": 200000, "global_hard": 1000000 }
+    },
+    "payments.transfer": {
+      "required": ["to_account", "amount_cents", "reason"],
+      "pii": false,
+      "limits": { "auto": 0, "hard": 1000000 },
+      "window": { "hours": 24, "agent_hard": 1000000, "global_hard": 2000000 }
+    },
+    "infrastructure.scale_down": {
+      "required": ["service", "replicas_from", "replicas_to", "reason"],
+      "pii": false,
+      "limits": { "auto": 2, "hard": 50 },
+      "window": { "hours": 24, "agent_auto": 4, "agent_hard": 20, "global_hard": 40 },
+      "change_window": { "environments": ["prod"], "start_hour": 1, "end_hour": 5 }
+    }
+  }
+}
