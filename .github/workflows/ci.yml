@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: countersigned_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      COUNTERSIGNED_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/countersigned_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e '.[dev]'
+      - name: Tests (unit, property-based, concurrency, tamper, API)
+        run: pytest
+      - name: Fixtures are current (engine and hashes did not drift from the committed file)
+        run: |
+          python fixtures/make_fixtures.py > /dev/null
+          git diff --exit-code fixtures/
+      - name: Adversarial eval (fails if any unsafe step runs unattended or a legitimate one is blocked)
+        run: python evals/run.py --check --emit-fixture --out /tmp/REPORT.md && git diff --exit-code fixtures/scenarios.json
+
+  playground:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run check

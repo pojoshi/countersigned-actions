@@ -1,0 +1,33 @@
+# Postgres + the API (with the executor inline).   docker compose up --build
+# Then:  curl localhost:8000/healthz   and see README.md for a first request.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: countersigned
+      POSTGRES_PASSWORD: countersigned
+      POSTGRES_DB: countersigned
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U countersigned"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://countersigned:countersigned@db:5432/countersigned
+      SEED_DEMO: "1"          # demo agents, approvers and a simulated business. Never in production.
+      WORKER: inline
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
