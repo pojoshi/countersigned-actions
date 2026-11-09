@@ -1,0 +1,7326 @@
+{
+ "policy_version": "p-9c5dead2ab0a",
+ "decisions": [
+  {
+   "name": "small soft delete executes",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "delete in staging",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "environment": "staging"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 100,
+    "risk_score": 10,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "staging",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in staging",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "delete, environment omitted",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "delete near the auto limit lowers confidence",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "twenty",
+    "count": 20,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 90,
+    "risk_score": 26,
+    "reversibility": "reversible",
+    "effective_quantity": 20,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'twenty' currently matches 20 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "20 <= 25",
+      "source": "policy"
+     },
+     {
+      "rule": "near_limit",
+      "detail": "20 is within 20% of the automatic limit 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "claim below data asks",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "mid",
+    "count": 30,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 43,
+    "reversibility": "reversible",
+    "effective_quantity": 40,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'mid' currently matches 40 records",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 30, data says 40",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "40 > 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "count must equal the 40 records segment 'mid' matches (agent said 30)"
+    ],
+    "reasons": [
+     "count must equal the 40 records segment 'mid' matches (agent said 30)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "claim above data asks",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 10,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 33,
+    "reversibility": "reversible",
+    "effective_quantity": 10,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 10, data says 3",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "10 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "count must equal the 3 records segment 'small' matches (agent said 10)"
+    ],
+    "reasons": [
+     "count must equal the 3 records segment 'small' matches (agent said 10)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "claim far below data",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "big",
+    "count": 10,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 75,
+    "risk_score": 80,
+    "reversibility": "reversible",
+    "effective_quantity": 600,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'big' currently matches 600 records",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 10, data says 600",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "600 > 25",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_hard",
+      "detail": "0 already + 600 = 600 > 500",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "600 in 24h would exceed this agent's hard cap of 500"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "over auto limit escalates",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "mid",
+    "count": 40,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 33,
+    "reversibility": "reversible",
+    "effective_quantity": 40,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'mid' currently matches 40 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "40 > 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "40 exceeds the automatic limit of 25 per action"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "over hard limit refuses",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "huge",
+    "count": 5000,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 70,
+    "reversibility": "reversible",
+    "effective_quantity": 5000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'huge' currently matches 5000 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_hard_limit",
+      "detail": "5000 > 2000",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_hard",
+      "detail": "0 already + 5000 = 5000 > 500",
+      "source": "policy"
+     },
+     {
+      "rule": "window_global_hard",
+      "detail": "0 already + 5000 = 5000 > 1000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "5000 exceeds the hard limit of 2000 per action",
+     "5000 in 24h would exceed this agent's hard cap of 500",
+     "5000 across all agents in 24h would exceed 1000"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "hard delete escalates",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "hard": true
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 55,
+    "reversibility": "irreversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "hard delete is permanent",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "irreversible actions need a human"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "hard flag of wrong type asks",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "hard": "yes"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "hard must be true or false"
+    ],
+    "reasons": [
+     "hard must be true or false"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "unknown segment asks",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "nowhere",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "'nowhere' unknown",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "segment 'nowhere' is not a known segment"
+    ],
+    "reasons": [
+     "segment 'nowhere' is not a known segment"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "empty segment, nonzero count asks",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "empty",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 30,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'empty' currently matches 0 records",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 3, data says 0",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "count must equal the 0 records segment 'empty' matches (agent said 3)"
+    ],
+    "reasons": [
+     "count must equal the 0 records segment 'empty' matches (agent said 3)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "missing ticket and reason",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "ticket_id is required",
+     "reason is required"
+    ],
+    "reasons": [
+     "ticket_id is required",
+     "reason is required"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "invented ticket",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-9",
+    "reason": "x"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 30,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-9 not found",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "ticket TKT-9 does not exist: cite a real, open ticket"
+    ],
+    "reasons": [
+     "ticket TKT-9 does not exist: cite a real, open ticket"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "wrong ticket kind",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-R",
+    "reason": "x"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 30,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "ticket TKT-R is open / refund_request; need an open erasure_request"
+    ],
+    "reasons": [
+     "ticket TKT-R is open / refund_request; need an open erasure_request"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "count as string",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": "3",
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 10,
+    "reversibility": "reversible",
+    "effective_quantity": null,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     }
+    ],
+    "missing_information": [
+     "count must be a positive integer"
+    ],
+    "reasons": [
+     "count must be a positive integer"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "count zero",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 0,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 10,
+    "reversibility": "reversible",
+    "effective_quantity": null,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     }
+    ],
+    "missing_information": [
+     "count must be a positive integer"
+    ],
+    "reasons": [
+     "count must be a positive integer"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "count boolean",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": true,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 95,
+    "risk_score": 10,
+    "reversibility": "reversible",
+    "effective_quantity": null,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     }
+    ],
+    "missing_information": [
+     "count must be a positive integer"
+    ],
+    "reasons": [
+     "count must be a positive integer"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "window pushes over the auto limit",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 48,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 22,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_auto",
+      "detail": "48 already + 3 = 51 > 50",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "51 in 24h exceeds the automatic window limit of 50 (cumulative, not per action)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "window at the auto limit exactly",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 47,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 22,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "window over the agent hard cap",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 499,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 40,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_hard",
+      "detail": "499 already + 3 = 502 > 500",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "502 in 24h would exceed this agent's hard cap of 500"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "window over the global cap",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 999,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     },
+     {
+      "rule": "window_global_hard",
+      "detail": "999 already + 3 = 1002 > 1000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "1002 across all agents in 24h would exceed 1000"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "kill switch",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": true,
+    "kill_reason": "incident",
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "kill_switch",
+      "detail": "all actions are halted",
+      "source": "state"
+     },
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "kill switch is on: incident"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "disabled agent",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": true,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "agent_enabled",
+      "detail": "support-bot is disabled",
+      "source": "state"
+     },
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "agent support-bot is disabled"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "no grant for operation",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "no grant for infrastructure.scale_down",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "change_window",
+      "detail": "now 12:xx UTC is outside 01-05",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "support-bot has no grant for infrastructure.scale_down"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "grant limited to staging",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "a",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 100,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "customer_data.delete_records not granted in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "a is not granted customer_data.delete_records in prod"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "unknown environment",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure",
+    "environment": "moon"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 100,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "environment must be 'staging' or 'prod'"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "agent cap",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "a",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 2
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "a may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "agent_cap",
+      "detail": "3 > 2",
+      "source": "state"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "3 exceeds this agent's cap of 2"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "unknown operation",
+   "operation": "customer_data.drop_table",
+   "params": {
+    "table": "x"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 100,
+    "reversibility": "irreversible",
+    "effective_quantity": null,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "known_operation",
+      "detail": "'customer_data.drop_table' is not in policy p-9c5dead2ab0a",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "unknown operation 'customer_data.drop_table'"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund small executes",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P1",
+    "amount_cents": 3000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 29,
+    "reversibility": "partial",
+    "effective_quantity": 3000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "P1 has 20000 cents left to refund",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is an open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3000 <= 5000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund over auto escalates",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P1",
+    "amount_cents": 6000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 34,
+    "reversibility": "partial",
+    "effective_quantity": 6000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "P1 has 20000 cents left to refund",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is an open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "6000 > 5000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "6000 exceeds the automatic limit of 5000 per action"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund over what is left refuses",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P2",
+    "amount_cents": 1000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 26,
+    "reversibility": "partial",
+    "effective_quantity": 1000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "P2 has 500 cents left to refund",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is an open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "1000 <= 5000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "refund of 1000 exceeds the 500 cents still refundable on P2"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund unknown payment asks",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "NOPE",
+    "amount_cents": 3000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 39,
+    "reversibility": "partial",
+    "effective_quantity": 3000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "NOPE not found",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is an open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3000 <= 5000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "payment NOPE does not exist"
+    ],
+    "reasons": [
+     "payment NOPE does not exist"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund closed ticket asks",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P1",
+    "amount_cents": 3000,
+    "ticket_id": "TKT-C",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 39,
+    "reversibility": "partial",
+    "effective_quantity": 3000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "P1 has 20000 cents left to refund",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-C is closed refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3000 <= 5000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "ticket TKT-C is closed / refund_request; need an open refund_request"
+    ],
+    "reasons": [
+     "ticket TKT-C is closed / refund_request; need an open refund_request"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "refund over agent grant cap",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P1",
+    "amount_cents": 150000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 70,
+    "reversibility": "partial",
+    "effective_quantity": 150000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.refund in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "money out can only be partly recovered",
+      "source": "policy"
+     },
+     {
+      "rule": "payment_verified",
+      "detail": "P1 has 20000 cents left to refund",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-R is an open refund_request",
+      "source": "fact"
+     },
+     {
+      "rule": "agent_cap",
+      "detail": "150000 > 100000",
+      "source": "state"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "150000 > 5000",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_auto",
+      "detail": "0 already + 150000 = 150000 > 20000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "refund of 150000 exceeds the 20000 cents still refundable on P1",
+     "150000 exceeds this agent's cap of 100000"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "transfer always escalates",
+   "operation": "payments.transfer",
+   "params": {
+    "to_account": "A1",
+    "amount_cents": 100,
+    "reason": "x"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 75,
+    "reversibility": "irreversible",
+    "effective_quantity": 100,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.transfer in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "transfers are final",
+      "source": "policy"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "100 > 0",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "100 exceeds the automatic limit of 0 per action",
+     "irreversible actions need a human",
+     "risk score 75 is at or above 60"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "transfer over hard limit",
+   "operation": "payments.transfer",
+   "params": {
+    "to_account": "A1",
+    "amount_cents": 2000000,
+    "reason": "x"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "finance-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": 100000
+      },
+      {
+       "operation": "payments.transfer",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 95,
+    "reversibility": "irreversible",
+    "effective_quantity": 2000000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "finance-bot may payments.transfer in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "transfers are final",
+      "source": "policy"
+     },
+     {
+      "rule": "per_action_hard_limit",
+      "detail": "2000000 > 1000000",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_hard",
+      "detail": "0 already + 2000000 = 2000000 > 1000000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "2000000 exceeds the hard limit of 1000000 per action",
+     "2000000 in 24h would exceed this agent's hard cap of 1000000"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "export internal executes",
+   "operation": "customer_data.export_records",
+   "params": {
+    "count": 50,
+    "destination": "internal-warehouse",
+    "ticket_id": "TKT-D",
+    "reason": "report"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "analytics-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.export_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 23,
+    "reversibility": "reversible",
+    "effective_quantity": 50,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "analytics-bot may customer_data.export_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "destination",
+      "detail": "internal-warehouse is inside the perimeter",
+      "source": "policy"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-D is an open data_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "50 <= 100",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "export internal over auto escalates",
+   "operation": "customer_data.export_records",
+   "params": {
+    "count": 500,
+    "destination": "internal-warehouse",
+    "ticket_id": "TKT-D",
+    "reason": "report"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "analytics-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.export_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 52,
+    "reversibility": "reversible",
+    "effective_quantity": 500,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "analytics-bot may customer_data.export_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "destination",
+      "detail": "internal-warehouse is inside the perimeter",
+      "source": "policy"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-D is an open data_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "500 > 100",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_auto",
+      "detail": "0 already + 500 = 500 > 300",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "500 exceeds the automatic limit of 100 per action",
+     "500 in 24h exceeds the automatic window limit of 300 (cumulative, not per action)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "export external escalates",
+   "operation": "customer_data.export_records",
+   "params": {
+    "count": 10,
+    "destination": "partner-sftp",
+    "ticket_id": "TKT-D",
+    "reason": "report"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "analytics-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.export_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 55,
+    "reversibility": "irreversible",
+    "effective_quantity": 10,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "analytics-bot may customer_data.export_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "destination",
+      "detail": "partner-sftp is external: data cannot be recalled",
+      "source": "policy"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-D is an open data_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "10 <= 100",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "irreversible actions need a human"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "export to unknown destination refuses",
+   "operation": "customer_data.export_records",
+   "params": {
+    "count": 10,
+    "destination": "evil.example",
+    "ticket_id": "TKT-D",
+    "reason": "report"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "analytics-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.export_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 55,
+    "reversibility": "irreversible",
+    "effective_quantity": 10,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "analytics-bot may customer_data.export_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "destination",
+      "detail": "evil.example is not allow-listed",
+      "source": "policy"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-D is an open data_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "10 <= 100",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "destination 'evil.example' is not on the allow-list"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale staging executes",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web-staging",
+    "replicas_from": 4,
+    "replicas_to": 3,
+    "reason": "cost",
+    "environment": "staging"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 100,
+    "risk_score": 4,
+    "reversibility": "reversible",
+    "effective_quantity": 1,
+    "environment": "staging",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in staging",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web-staging currently runs 4 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "1 <= 2",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale prod at noon defers",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "defer",
+    "confidence": 100,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "change_window",
+      "detail": "now 12:xx UTC is outside 01-05",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "prod changes are only allowed 01:00-05:00 UTC"
+    ],
+    "retry_after": "2026-10-27T01:00:00.000Z",
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale prod at 03:00 executes",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T03:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 90,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "near_limit",
+      "detail": "2 is within 20% of the automatic limit 2",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale prod 4 replicas escalates at 03:00",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 6,
+    "reason": "cost",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T03:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 100,
+    "risk_score": 29,
+    "reversibility": "reversible",
+    "effective_quantity": 4,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "4 > 2",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "4 exceeds the automatic limit of 2 per action"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale prod, environment omitted, noon defers",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "defer",
+    "confidence": 95,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "change_window",
+      "detail": "now 12:xx UTC is outside 01-05",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "prod changes are only allowed 01:00-05:00 UTC"
+    ],
+    "retry_after": "2026-10-27T01:00:00.000Z",
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale with stale replica claim asks",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 8,
+    "replicas_to": 7,
+    "reason": "cost",
+    "environment": "staging"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 80,
+    "risk_score": 14,
+    "reversibility": "reversible",
+    "effective_quantity": 1,
+    "environment": "staging",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in staging",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 8, service has 10",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "1 <= 2",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "web runs 10 replicas, not 8"
+    ],
+    "reasons": [
+     "web runs 10 replicas, not 8"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale to a higher number asks",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 12,
+    "reason": "cost",
+    "environment": "staging"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 100,
+    "risk_score": 0,
+    "reversibility": "reversible",
+    "effective_quantity": null,
+    "environment": "staging",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in staging",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     }
+    ],
+    "missing_information": [
+     "replicas_to must be lower than replicas_from"
+    ],
+    "reasons": [
+     "replicas_to must be lower than replicas_from"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "scale unknown service asks",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "ghost",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost",
+    "environment": "staging"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 80,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "staging",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in staging",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "service 'ghost' does not exist"
+    ],
+    "reasons": [
+     "service 'ghost' does not exist"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "precedence: kill switch beats defer",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": true,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 100,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "kill_switch",
+      "detail": "all actions are halted",
+      "source": "state"
+     },
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "change_window",
+      "detail": "now 12:xx UTC is outside 01-05",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "kill switch is on"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "precedence: ask beats defer",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "",
+    "environment": "prod"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "infra-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "infrastructure.scale_down",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 100,
+    "risk_score": 19,
+    "reversibility": "reversible",
+    "effective_quantity": 2,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "infra-bot may infrastructure.scale_down in prod",
+      "source": "state"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "replicas can be scaled back up",
+      "source": "policy"
+     },
+     {
+      "rule": "service_verified",
+      "detail": "web currently runs 10 replicas",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "2 <= 2",
+      "source": "policy"
+     },
+     {
+      "rule": "change_window",
+      "detail": "now 12:xx UTC is outside 01-05",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "reason is required"
+    ],
+    "reasons": [
+     "reason is required"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "execute mode, human approval lifts escalation",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "mid",
+    "count": 40,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "execute",
+    "human_approved": true
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 85,
+    "risk_score": 33,
+    "reversibility": "reversible",
+    "effective_quantity": 40,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'mid' currently matches 40 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "40 > 25",
+      "source": "policy"
+     },
+     {
+      "rule": "human_approval",
+      "detail": "a recorded approval matches this exact action",
+      "source": "state"
+     },
+     {
+      "rule": "near_limit",
+      "detail": "40 is within 20% of the automatic limit 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "human approval covers: 40 exceeds the automatic limit of 25 per action"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "execute mode, no approval stays escalated",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "mid",
+    "count": 40,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "execute",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "escalate",
+    "confidence": 95,
+    "risk_score": 33,
+    "reversibility": "reversible",
+    "effective_quantity": 40,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'mid' currently matches 40 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "40 > 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "40 exceeds the automatic limit of 25 per action"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "execute mode, approval does not lift refusal",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "huge",
+    "count": 5000,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "execute",
+    "human_approved": true
+   },
+   "expected": {
+    "outcome": "refuse",
+    "confidence": 95,
+    "risk_score": 70,
+    "reversibility": "reversible",
+    "effective_quantity": 5000,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'huge' currently matches 5000 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_hard_limit",
+      "detail": "5000 > 2000",
+      "source": "policy"
+     },
+     {
+      "rule": "window_agent_hard",
+      "detail": "0 already + 5000 = 5000 > 500",
+      "source": "policy"
+     },
+     {
+      "rule": "window_global_hard",
+      "detail": "0 already + 5000 = 5000 > 1000",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "5000 exceeds the hard limit of 2000 per action",
+     "5000 in 24h would exceed this agent's hard cap of 500",
+     "5000 across all agents in 24h would exceed 1000"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "execute mode, approval does not lift a stale claim",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "mid",
+    "count": 30,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "execute",
+    "human_approved": true
+   },
+   "expected": {
+    "outcome": "ask",
+    "confidence": 75,
+    "risk_score": 43,
+    "reversibility": "reversible",
+    "effective_quantity": 40,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'mid' currently matches 40 records",
+      "source": "fact"
+     },
+     {
+      "rule": "claim_mismatch",
+      "detail": "agent said 30, data says 40",
+      "source": "agent_claim"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "40 > 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [
+     "count must equal the 40 records segment 'mid' matches (agent said 30)"
+    ],
+    "reasons": [
+     "count must equal the 40 records segment 'mid' matches (agent said 30)"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  },
+  {
+   "name": "unicode reason is fine",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "Löschung ✓"
+   },
+   "context": {
+    "now": "2026-10-26T12:00:00.000Z",
+    "agent": {
+     "id": "support-bot",
+     "disabled": false,
+     "grants": [
+      {
+       "operation": "customer_data.delete_records",
+       "environments": [
+        "staging",
+        "prod"
+       ],
+       "max_quantity": null
+      },
+      {
+       "operation": "payments.refund",
+       "environments": [
+        "prod"
+       ],
+       "max_quantity": null
+      }
+     ]
+    },
+    "facts": {
+     "tickets": {
+      "TKT-1": {
+       "kind": "erasure_request",
+       "status": "open"
+      },
+      "TKT-D": {
+       "kind": "data_request",
+       "status": "open"
+      },
+      "TKT-R": {
+       "kind": "refund_request",
+       "status": "open"
+      },
+      "TKT-C": {
+       "kind": "refund_request",
+       "status": "closed"
+      }
+     },
+     "segment_sizes": {
+      "small": 3,
+      "twenty": 20,
+      "mid": 40,
+      "big": 600,
+      "huge": 5000,
+      "empty": 0
+     },
+     "payments": {
+      "P1": {
+       "amount_cents": 20000,
+       "refunded_cents": 0
+      },
+      "P2": {
+       "amount_cents": 9000,
+       "refunded_cents": 8500
+      }
+     },
+     "services": {
+      "web": 10,
+      "web-staging": 4
+     }
+    },
+    "usage_agent": 0,
+    "usage_global": 0,
+    "kill_switch": false,
+    "kill_reason": null,
+    "mode": "propose",
+    "human_approved": false
+   },
+   "expected": {
+    "outcome": "execute",
+    "confidence": 95,
+    "risk_score": 20,
+    "reversibility": "reversible",
+    "effective_quantity": 3,
+    "environment": "prod",
+    "evidence": [
+     {
+      "rule": "grant",
+      "detail": "support-bot may customer_data.delete_records in prod",
+      "source": "state"
+     },
+     {
+      "rule": "environment",
+      "detail": "not specified; assuming prod",
+      "source": "policy"
+     },
+     {
+      "rule": "reversibility",
+      "detail": "soft delete can be restored",
+      "source": "policy"
+     },
+     {
+      "rule": "segment_resolved",
+      "detail": "segment 'small' currently matches 3 records",
+      "source": "fact"
+     },
+     {
+      "rule": "ticket_verified",
+      "detail": "TKT-1 is an open erasure_request",
+      "source": "fact"
+     },
+     {
+      "rule": "per_action_auto_limit",
+      "detail": "3 <= 25",
+      "source": "policy"
+     }
+    ],
+    "missing_information": [],
+    "reasons": [
+     "within every limit"
+    ],
+    "retry_after": null,
+    "policy_version": "p-9c5dead2ab0a"
+   }
+  }
+ ],
+ "canonical": [
+  {
+   "input": {},
+   "canonical": "{}",
+   "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+  },
+  {
+   "input": {
+    "b": 1,
+    "a": 2
+   },
+   "canonical": "{\"a\":2,\"b\":1}",
+   "sha256": "d3626ac30a87e6f7a6428233b3c68299976865fa5508e4267c5415c76af7a772"
+  },
+  {
+   "input": {
+    "z": [
+     3,
+     1,
+     2
+    ],
+    "a": {
+     "y": true,
+     "x": null
+    }
+   },
+   "canonical": "{\"a\":{\"x\":null,\"y\":true},\"z\":[3,1,2]}",
+   "sha256": "b34ddc7cc6dc5c7cc19db4e3526c205b9b295fa8787094d1eff680e929a5504e"
+  },
+  {
+   "input": {
+    "text": "é✓ \"quoted\" \\ \n"
+   },
+   "canonical": "{\"text\":\"é✓ \\\"quoted\\\" \\\\ \\n\"}",
+   "sha256": "47331fce8cc0725b73533d7c322da0cf7f045cca459fe754d529f4d9defe6a23"
+  },
+  {
+   "input": {
+    "n": -5,
+    "big": 9007199254740991,
+    "zero": 0
+   },
+   "canonical": "{\"big\":9007199254740991,\"n\":-5,\"zero\":0}",
+   "sha256": "f4325efa9f69365aa304f4074cd945ece6ed1e023f81dc2151a54936ed62a9e2"
+  },
+  {
+   "input": [],
+   "canonical": "[]",
+   "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+   "input": "plain",
+   "canonical": "\"plain\"",
+   "sha256": "945603a8f587786b463c3f94fce115c0fae88fac2728cc96ddf5981cf7f61741"
+  }
+ ],
+ "action_hashes": [
+  {
+   "agent": "support-bot",
+   "operation": "customer_data.delete_records",
+   "params": {
+    "segment": "small",
+    "count": 3,
+    "ticket_id": "TKT-1",
+    "reason": "erasure"
+   },
+   "hash": "8b4d531577a7aae8b856564d2cdaac0728c730186baacfa1295f93a5b4cd8804"
+  },
+  {
+   "agent": "finance-bot",
+   "operation": "payments.refund",
+   "params": {
+    "payment_id": "P1",
+    "amount_cents": 3000,
+    "ticket_id": "TKT-R",
+    "reason": "complaint"
+   },
+   "hash": "c26ba2d0f21eca2898aef095bc1b91bf64d571c8b6d06c9f1685104c9a0d49aa"
+  },
+  {
+   "agent": "infra-bot",
+   "operation": "infrastructure.scale_down",
+   "params": {
+    "service": "web",
+    "replicas_from": 10,
+    "replicas_to": 8,
+    "reason": "cost",
+    "environment": "prod"
+   },
+   "hash": "12b11be5460cf5882fd71062909e3e7d26d410393dcb66b89cf0671354468bff"
+  },
+  {
+   "agent": "analytics-bot",
+   "operation": "customer_data.export_records",
+   "params": {
+    "count": 50,
+    "destination": "internal-warehouse",
+    "reason": "Löschung ✓",
+    "ticket_id": "TKT-D"
+   },
+   "hash": "93bbd93db45e0fa4474cab9ce05de942eb285f0b1aa8f29b3f01f0510f7bf52c"
+  }
+ ],
+ "chain": [
+  {
+   "seq": 1,
+   "ts": "2026-10-26T12:00:01.000Z",
+   "event_type": "decision",
+   "action_id": "act_1",
+   "actor": "support-bot",
+   "payload": {
+    "status": "queued",
+    "decision": {
+     "outcome": "execute",
+     "risk_score": 20
+    }
+   },
+   "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+   "hash": "fa6b822afcb77ecb04054f48788c9489c97ddb1afb4140a9d21f2ce1365eeb2b"
+  },
+  {
+   "seq": 2,
+   "ts": "2026-10-26T12:00:02.000Z",
+   "event_type": "executed",
+   "action_id": "act_1",
+   "actor": "worker",
+   "payload": {
+    "result": {
+     "deleted": 3
+    }
+   },
+   "prev_hash": "fa6b822afcb77ecb04054f48788c9489c97ddb1afb4140a9d21f2ce1365eeb2b",
+   "hash": "20751c66f451ebc4f7e7a0f6e713a68ae0f2d4d16ddba765de73741dda14cba6"
+  },
+  {
+   "seq": 3,
+   "ts": "2026-10-26T12:00:03.000Z",
+   "event_type": "kill_switch_on",
+   "action_id": null,
+   "actor": "admin",
+   "payload": {
+    "reason": "Löschung ✓"
+   },
+   "prev_hash": "20751c66f451ebc4f7e7a0f6e713a68ae0f2d4d16ddba765de73741dda14cba6",
+   "hash": "5448218a76101aaf3184a496e92eda890a492da1ff8a9fc9c3c16ace2db6f072"
+  },
+  {
+   "seq": 4,
+   "ts": "2026-10-26T12:00:04.000Z",
+   "event_type": "decision",
+   "action_id": "act_2",
+   "actor": "finance-bot",
+   "payload": {
+    "params": {
+     "amount_cents": 4000,
+     "payment_id": "P1"
+    }
+   },
+   "prev_hash": "5448218a76101aaf3184a496e92eda890a492da1ff8a9fc9c3c16ace2db6f072",
+   "hash": "1a45d70f4c7e756bc324a5d9029a9a0be633cd7582771b2308a3164bf106aa8b"
+  }
+ ]
+}

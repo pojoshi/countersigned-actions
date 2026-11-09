@@ -1,0 +1,150 @@
+{
+ "agents": {
+  "support-bot": [
+   {
+    "operation": "customer_data.delete_records",
+    "environments": [
+     "staging",
+     "prod"
+    ]
+   },
+   {
+    "operation": "payments.refund",
+    "environments": [
+     "prod"
+    ]
+   }
+  ],
+  "analytics-bot": [
+   {
+    "operation": "customer_data.export_records",
+    "environments": [
+     "staging",
+     "prod"
+    ]
+   }
+  ],
+  "infra-bot": [
+   {
+    "operation": "infrastructure.scale_down",
+    "environments": [
+     "staging",
+     "prod"
+    ]
+   }
+  ],
+  "finance-bot": [
+   {
+    "operation": "payments.refund",
+    "environments": [
+     "prod"
+    ],
+    "max_quantity": 100000
+   },
+   {
+    "operation": "payments.transfer",
+    "environments": [
+     "prod"
+    ]
+   }
+  ]
+ },
+ "segments": {
+  "inactive-2y": 600,
+  "dormant-500": 500,
+  "trial-expired": 300,
+  "marketing-optout": 240,
+  "vip": 40,
+  "test-accounts": 12,
+  "eu-erasure-batch": 20,
+  "eu-erasure-b2": 20,
+  "eu-erasure-b3": 20,
+  "eu-erasure-single": 3
+ },
+ "tickets": [
+  {
+   "id": "TKT-1001",
+   "kind": "erasure_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1002",
+   "kind": "erasure_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1003",
+   "kind": "data_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1004",
+   "kind": "refund_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1005",
+   "kind": "refund_request",
+   "status": "closed"
+  },
+  {
+   "id": "TKT-1006",
+   "kind": "erasure_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1007",
+   "kind": "refund_request",
+   "status": "open"
+  },
+  {
+   "id": "TKT-1008",
+   "kind": "data_request",
+   "status": "open"
+  }
+ ],
+ "payments": [
+  {
+   "id": "PAY-1",
+   "amount_cents": 20000,
+   "refunded_cents": 0
+  },
+  {
+   "id": "PAY-2",
+   "amount_cents": 3000,
+   "refunded_cents": 0
+  },
+  {
+   "id": "PAY-3",
+   "amount_cents": 400000,
+   "refunded_cents": 0
+  },
+  {
+   "id": "PAY-4",
+   "amount_cents": 9000,
+   "refunded_cents": 8500
+  }
+ ],
+ "services": [
+  {
+   "name": "web",
+   "environment": "prod",
+   "replicas": 10
+  },
+  {
+   "name": "worker",
+   "environment": "prod",
+   "replicas": 6
+  },
+  {
+   "name": "web-staging",
+   "environment": "staging",
+   "replicas": 4
+  },
+  {
+   "name": "batch",
+   "environment": "prod",
+   "replicas": 30
+  }
+ ]
+}
