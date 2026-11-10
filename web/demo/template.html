@@ -57,7 +57,8 @@ textarea#customJson { width: 100%; min-height: 150px; margin-top: 8px; padding: 
 .btn { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 6px; padding: 7px 12px; cursor: pointer; font-weight: 600; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); font-weight: 500; }
 .btn:hover { filter: brightness(1.12); }
-select { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+select { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; max-width: 100%; min-width: 0; }
+.row select { flex: 1 1 auto; text-overflow: ellipsis; }
 
 /* decision slip: the one memorable element */
 .slip { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 18px 14px; overflow: hidden; }
@@ -166,7 +167,7 @@ footer a { color: inherit; }
     </div>
     <div class="row">
       <label for="timeSelect">Time (UTC)</label>
-      <select id="timeSelect"><option value="12">12:00, outside the prod change window</option><option value="3">03:00, inside it</option></select>
+      <select id="timeSelect" title="12:00 UTC is outside the prod change window; 03:00 UTC is inside it"><option value="12">12:00 — outside change window</option><option value="3">03:00 — inside it</option></select>
     </div>
     <div class="row">
       <button class="btn ghost" id="advanceBtn" type="button">Move on 25 hours</button>
